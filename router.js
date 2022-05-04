@@ -45,4 +45,23 @@ validateTalker, getData,
   fs.writeFile('./talker.json', JSON.stringify([...data, talker], null, 2))
   .then((_res) => response.status(201).json(talker));
 });
+
+router.put('/talker/:id',
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalker,
+  getData,
+  async (request, response) => {
+    const { data } = request;
+    const { id } = request.params;
+    const indexTalker = data.findIndex((talker) => talker.id === Number(id));
+    data[indexTalker] = {
+      ...data[indexTalker],
+      ...request.body,
+    };
+    fs.writeFile('./talker.json', JSON.stringify([...data], null, 2))
+    .then((_res) => response.status(200).json(data[indexTalker]));
+});
+
 module.exports = router; 
