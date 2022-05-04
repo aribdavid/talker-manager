@@ -1,8 +1,13 @@
 const express = require('express');
 const crypto = require('crypto');
+const fs = require('fs').promises;
 const getData = require('./middlewares/getData');
 const validateEmail = require('./middlewares/validateEmail');
 const validatePassword = require('./middlewares/validatePassword');
+const validateAge = require('./middlewares/validateAge');
+const validateToken = require('./middlewares/validateToken');
+const validateTalker = require('./middlewares/validateTalker');
+const validateName = require('./middlewares/validateName');
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
@@ -32,4 +37,12 @@ router.post('/login', validateEmail, validatePassword, (_request, response) => {
   return response.status(HTTP_OK_STATUS).json({ token });
 });
 
+router.post('/talker', validateToken, validateName, validateAge, 
+validateTalker, getData,
+ async (request, response) => {
+  const { data } = request;
+  const talker = { id: data.length + 1, ...request.body };
+  fs.writeFile('./talker.json', JSON.stringify([...data, talker], null, 2))
+  .then((_res) => response.status(201).json(talker));
+});
 module.exports = router; 
