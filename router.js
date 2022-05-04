@@ -74,4 +74,13 @@ router.delete('/talker/:id', validateToken, getData, async (request, response) =
   .then((_res) => response.status(204).send());
 });
 
+router.get('/talker/search', validateToken, getData, (request, response) => {
+  const { data } = request;
+  const { q } = request.query;
+  if (!q) return response.status(200).json(data);
+  const talkersFiltered = data.filter((talker) => talker.name.includes(q));
+  if (!talkersFiltered.length) response.status(200).json(data);
+  response.status(200).json(talkersFiltered);
+});
+
 module.exports = router; 
