@@ -1,21 +1,13 @@
 const express = require('express');
-const fs = require('fs').promises;
 const crypto = require('crypto');
+const getData = require('./middlewares/getData');
+const validateEmail = require('./middlewares/validateEmail');
+const validatePassword = require('./middlewares/validatePassword');
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
 
 const router = express.Router();
-
-const getData = async (request, _response, next) => {
-  try {
-    const data = await fs.readFile('./talker.json');
-    next();
-    request.data = JSON.parse(data);
-  } catch (error) {
-    next(error);
-  }
-};
 
 router.get('/talker', getData, (request, response) => {
   const { data } = request;
@@ -34,7 +26,7 @@ router.get('/talker/:id', getData, (request, response) => {
 return response.status(HTTP_OK_STATUS).json(talkerId);
 });
 
-router.post('/login', (_request, response) => {
+router.post('/login', validateEmail, validatePassword, (_request, response) => {
   // const { email, password } = request.body;
   const token = crypto.randomBytes(8).toString('hex');
   return response.status(HTTP_OK_STATUS).json({ token });
